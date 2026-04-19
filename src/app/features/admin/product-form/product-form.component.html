@@ -1,0 +1,117 @@
+<div class="admin-layout">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">🛒 Shopping Cart <span class="badge-admin">Admin</span></div>
+    @if (currentUser$ | async; as user) {
+      <div class="navbar-user">
+        <span>Olá, {{ user.name }}</span>
+        <button class="btn-logout" (click)="onLogout()">Sair</button>
+      </div>
+    }
+  </nav>
+
+  <!-- Conteúdo -->
+  <main class="admin-main">
+    <div class="form-card">
+
+      <div class="form-card-header">
+        <h2>Cadastrar Produto</h2>
+        <p>Preencha os dados para adicionar um novo produto ao catálogo</p>
+      </div>
+
+      @if (successMessage) {
+        <div class="alert-success">✅ {{ successMessage }}</div>
+      }
+
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- Nome -->
+        <div class="form-group" [class.has-error]="f['name'].invalid && f['name'].touched">
+          <label for="name">Nome do Produto</label>
+          <input id="name" type="text" formControlName="name" placeholder="Ex: Notebook Gamer Pro" />
+          @if (f['name'].touched && f['name'].invalid) {
+            <div class="error-messages">
+              @if (f['name'].hasError('required')) { <span>Nome é obrigatório</span> }
+              @if (f['name'].hasError('minlength')) { <span>Mínimo 3 caracteres</span> }
+              @if (f['name'].hasError('maxlength')) { <span>Máximo 60 caracteres</span> }
+            </div>
+          }
+        </div>
+
+        <!-- Descrição -->
+        <div class="form-group" [class.has-error]="f['description'].invalid && f['description'].touched">
+          <label for="description">Descrição</label>
+          <textarea id="description" formControlName="description" rows="3"
+            placeholder="Descreva o produto em detalhes..."></textarea>
+          @if (f['description'].touched && f['description'].invalid) {
+            <div class="error-messages">
+              @if (f['description'].hasError('required')) { <span>Descrição é obrigatória</span> }
+              @if (f['description'].hasError('minlength')) { <span>Mínimo 10 caracteres</span> }
+              @if (f['description'].hasError('maxlength')) { <span>Máximo 200 caracteres</span> }
+            </div>
+          }
+        </div>
+
+        <!-- Preço e Estoque -->
+        <div class="form-row">
+          <div class="form-group" [class.has-error]="f['price'].invalid && f['price'].touched">
+            <label for="price">Preço (R$)</label>
+            <input id="price" type="number" formControlName="price" placeholder="0,00" min="0.01" step="0.01" />
+            @if (f['price'].touched && f['price'].invalid) {
+              <div class="error-messages">
+                @if (f['price'].hasError('required')) { <span>Preço é obrigatório</span> }
+                @if (f['price'].hasError('min')) { <span>Preço deve ser maior que zero</span> }
+              </div>
+            }
+          </div>
+
+          <div class="form-group" [class.has-error]="f['stock'].invalid && f['stock'].touched">
+            <label for="stock">Estoque</label>
+            <input id="stock" type="number" formControlName="stock" placeholder="0" min="0" />
+            @if (f['stock'].touched && f['stock'].invalid) {
+              <div class="error-messages">
+                @if (f['stock'].hasError('required')) { <span>Estoque é obrigatório</span> }
+                @if (f['stock'].hasError('min')) { <span>Estoque não pode ser negativo</span> }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- URL da Imagem -->
+        <div class="form-group" [class.has-error]="f['imageUrl'].invalid && f['imageUrl'].touched">
+          <label for="imageUrl">URL da Imagem</label>
+          <input id="imageUrl" type="url" formControlName="imageUrl"
+            placeholder="https://exemplo.com/imagem.jpg" />
+          @if (f['imageUrl'].touched && f['imageUrl'].invalid) {
+            <div class="error-messages">
+              @if (f['imageUrl'].hasError('required')) { <span>URL da imagem é obrigatória</span> }
+              @if (f['imageUrl'].hasError('pattern')) { <span>Informe uma URL válida (http/https)</span> }
+            </div>
+          }
+          @if (f['imageUrl'].valid && f['imageUrl'].value) {
+            <div class="image-preview">
+              <img [src]="f['imageUrl'].value" alt="Preview" />
+            </div>
+          }
+        </div>
+
+        <!-- Botões -->
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="productForm.reset()">
+            Limpar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="isLoading$ | async">
+            @if (isLoading$ | async) {
+              <span class="spinner"></span> Salvando...
+            } @else {
+              Cadastrar Produto
+            }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+</div>
