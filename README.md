@@ -1,27 +1,56 @@
-# ShoppingCartAngular
+# 🛒 Shopping Cart Angular
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+Aplicação de carrinho de compras construída com **Angular 17**, **NgRx**, **GitFlow** e boas práticas de desenvolvimento.
 
-## Development server
+## Tecnologias
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- **Angular 17** — Framework principal
+- **NgRx 17** — Gerenciamento de estado (Store, Effects, Selectors)
+- **SCSS** — Estilização com design customizado
+- **Husky + Commitlint** — Padronização de commits (Conventional Commits)
+- **ESLint** — Qualidade de código
+- **GitFlow** — Estratégia de branches
 
-## Code scaffolding
+## Perfis de Acesso
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+| Perfil | Email | Senha | Acesso |
+|--------|-------|-------|--------|
+| Admin | `admin@shop.com` | `admin123` | Cadastro de produtos |
+| Cliente | `client@shop.com` | `client123` | Lista e carrinho |
 
-## Build
+## Funcionalidades
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- Login mockado com redirecionamento por perfil
+- Guard de rotas por role (admin / client)
+- Formulário reativo de cadastro de produtos (Admin)
+- Lista de produtos com skeleton loading (Cliente)
+- Carrinho com controle de quantidade e total calculado
+- Spinner global via HTTP Interceptor + NgRx
+- Lazy loading de módulos por feature
 
-## Running unit tests
+## Arquitetura NgRx
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```
+store/
+├── auth/       → user, isLoading, error
+├── products/   → items[], isLoading
+├── cart/       → items[], total (selector)
+└── loading/    → count (HTTP global)
+```
 
-## Running end-to-end tests
+## Executar localmente
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+```bash
+npm install
+ng serve
+```
 
-## Further help
+Acesse: `http://localhost:4200`
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Padrão de Commits
+
+```
+feat(scope): descrição
+fix(scope): descrição
+chore: descrição
+```
