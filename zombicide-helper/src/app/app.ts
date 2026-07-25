@@ -10,7 +10,7 @@ type BoxFilter = 'all' | 'owned' | string;
 })
 export class App {
   protected readonly groups = CHARACTER_GROUPS;
-  protected readonly selectedBox = signal<BoxFilter>('owned');
+  protected readonly selectedBox = signal<BoxFilter>('all');
   protected readonly drawnCharacter = signal<string | null>(null);
   protected readonly isDrawing = signal(false);
 

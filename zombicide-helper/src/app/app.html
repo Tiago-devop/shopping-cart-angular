@@ -12,8 +12,8 @@
         [value]="selectedBox()"
         (change)="onBoxChange($any($event.target).value)"
       >
-        <option value="owned">⭐ Minhas caixas</option>
         <option value="all">Todas as caixas</option>
+        <option value="owned">⭐ Minhas caixas</option>
         @for (group of groups; track group.box) {
           <option [value]="group.box">{{ group.box }}</option>
         }
