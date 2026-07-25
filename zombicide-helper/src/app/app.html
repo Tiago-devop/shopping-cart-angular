@@ -4,25 +4,38 @@
     <p class="app__subtitle">Sorteie um sobrevivente para a sua partida</p>
   </header>
 
-  <section class="draw">
-    <label class="draw__filter">
-      <span class="draw__filter-label">Sortear entre:</span>
-      <select
-        class="draw__select"
-        [value]="selectedBox()"
-        (change)="onBoxChange($any($event.target).value)"
-      >
-        <option value="all">Todas as caixas</option>
-        <option value="owned">⭐ Minhas caixas</option>
-        @for (group of groups; track group.box) {
-          <option [value]="group.box">{{ group.box }}</option>
-        }
-      </select>
-    </label>
+  <section class="packs">
+    <div class="packs__header">
+      <h2 class="packs__title">Packs no sorteio</h2>
+      <div class="packs__shortcuts">
+        <button type="button" class="packs__shortcut" (click)="selectAllBoxes()">Todos</button>
+        <button type="button" class="packs__shortcut" (click)="selectOwnedBoxes()">⭐ Meus</button>
+        <button type="button" class="packs__shortcut" (click)="selectNoBoxes()">Nenhum</button>
+      </div>
+    </div>
+    <ul class="packs__list">
+      @for (group of groups; track group.box) {
+        <li>
+          <button
+            type="button"
+            class="packs__toggle"
+            [class.packs__toggle--active]="isBoxActive(group.box)"
+            (click)="toggleBox(group.box)"
+          >
+            {{ group.owned ? '⭐ ' : '' }}{{ group.box }}
+            <span class="packs__count">{{ group.characters.length }}</span>
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
 
+  <section class="draw">
     <div class="draw__result" [class.draw__result--spinning]="isDrawing()">
-      @if (drawnCharacter(); as character) {
+      @if (spinningName() ?? lastDrawn(); as character) {
         <span class="draw__name">{{ character }}</span>
+      } @else if (pool().length === 0) {
+        <span class="draw__placeholder">Nenhum sobrevivente disponível — ative um pack ou limpe os sorteados</span>
       } @else {
         <span class="draw__placeholder">Clique no botão para sortear</span>
       }
@@ -32,23 +45,35 @@
       type="button"
       class="draw__button"
       (click)="drawCharacter()"
-      [disabled]="isDrawing()"
+      [disabled]="isDrawing() || pool().length === 0"
     >
       {{ isDrawing() ? 'Sorteando...' : 'Sortear sobrevivente' }}
     </button>
+    <p class="draw__pool-info">{{ pool().length }} sobreviventes disponíveis no sorteio</p>
   </section>
 
-  <footer class="roster">
-    <h2 class="roster__title">{{ pool().length }} sobreviventes no sorteio</h2>
-    <ul class="roster__list">
-      @for (character of pool(); track $index) {
-        <li
-          class="roster__item"
-          [class.roster__item--drawn]="character === drawnCharacter()"
-        >
-          {{ character }}
-        </li>
+  <section class="drawn">
+    <div class="drawn__header">
+      <h2 class="drawn__title">Sorteados ({{ drawnCharacters().length }})</h2>
+      @if (drawnCharacters().length > 0) {
+        <button type="button" class="drawn__clear" (click)="clearDrawn()">Limpar</button>
       }
-    </ul>
-  </footer>
+    </div>
+    <div class="drawn__box">
+      @if (drawnCharacters().length === 0) {
+        <p class="drawn__empty">Os sobreviventes sorteados aparecerão aqui.</p>
+      } @else {
+        <ol class="drawn__list">
+          @for (character of drawnCharacters(); track $index) {
+            <li
+              class="drawn__item"
+              [class.drawn__item--latest]="character === lastDrawn() && $index === drawnCharacters().length - 1"
+            >
+              {{ character }}
+            </li>
+          }
+        </ol>
+      }
+    </div>
+  </section>
 </main>

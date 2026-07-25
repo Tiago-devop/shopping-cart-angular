@@ -1,8 +1,6 @@
 import { Component, computed, signal } from '@angular/core';
 import { CHARACTER_GROUPS } from './characters';
 
-type BoxFilter = 'all' | 'owned' | string;
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.html',
@@ -10,24 +8,58 @@ type BoxFilter = 'all' | 'owned' | string;
 })
 export class App {
   protected readonly groups = CHARACTER_GROUPS;
-  protected readonly selectedBox = signal<BoxFilter>('all');
-  protected readonly drawnCharacter = signal<string | null>(null);
+  protected readonly activeBoxes = signal<ReadonlySet<string>>(
+    new Set(CHARACTER_GROUPS.map((group) => group.box)),
+  );
+  protected readonly drawnCharacters = signal<string[]>([]);
+  protected readonly spinningName = signal<string | null>(null);
   protected readonly isDrawing = signal(false);
 
+  // Personagens dos packs ativos que ainda não foram sorteados.
   protected readonly pool = computed(() => {
-    const filter = this.selectedBox();
-    const groups =
-      filter === 'all'
-        ? this.groups
-        : filter === 'owned'
-          ? this.groups.filter((group) => group.owned)
-          : this.groups.filter((group) => group.box === filter);
-    return groups.flatMap((group) => group.characters);
+    const active = this.activeBoxes();
+    const drawn = new Set(this.drawnCharacters());
+    return this.groups
+      .filter((group) => active.has(group.box))
+      .flatMap((group) => group.characters)
+      .filter((character) => !drawn.has(character));
   });
 
-  onBoxChange(value: string): void {
-    this.selectedBox.set(value);
-    this.drawnCharacter.set(null);
+  protected readonly lastDrawn = computed(
+    () => this.drawnCharacters().at(-1) ?? null,
+  );
+
+  isBoxActive(box: string): boolean {
+    return this.activeBoxes().has(box);
+  }
+
+  toggleBox(box: string): void {
+    const next = new Set(this.activeBoxes());
+    if (next.has(box)) {
+      next.delete(box);
+    } else {
+      next.add(box);
+    }
+    this.activeBoxes.set(next);
+  }
+
+  selectAllBoxes(): void {
+    this.activeBoxes.set(new Set(this.groups.map((group) => group.box)));
+  }
+
+  selectNoBoxes(): void {
+    this.activeBoxes.set(new Set());
+  }
+
+  selectOwnedBoxes(): void {
+    this.activeBoxes.set(
+      new Set(this.groups.filter((group) => group.owned).map((group) => group.box)),
+    );
+  }
+
+  clearDrawn(): void {
+    this.drawnCharacters.set([]);
+    this.spinningName.set(null);
   }
 
   drawCharacter(): void {
@@ -41,16 +73,19 @@ export class App {
     const spins = 12;
     let count = 0;
     const interval = setInterval(() => {
-      this.drawnCharacter.set(this.randomCharacter());
+      const name = this.randomFromPool();
+      this.spinningName.set(name);
       count++;
       if (count >= spins) {
         clearInterval(interval);
+        this.drawnCharacters.update((drawn) => [...drawn, name]);
+        this.spinningName.set(null);
         this.isDrawing.set(false);
       }
     }, 80);
   }
 
-  private randomCharacter(): string {
+  private randomFromPool(): string {
     const pool = this.pool();
     return pool[Math.floor(Math.random() * pool.length)];
   }
