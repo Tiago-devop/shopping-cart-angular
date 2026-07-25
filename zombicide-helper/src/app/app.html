@@ -1,0 +1,39 @@
+<main class="app">
+  <header class="app__header">
+    <h1 class="app__title">🧟 Zombicide Helper</h1>
+    <p class="app__subtitle">Sorteie um personagem para a sua partida</p>
+  </header>
+
+  <section class="draw">
+    <div class="draw__result" [class.draw__result--spinning]="isDrawing()">
+      @if (drawnCharacter(); as character) {
+        <span class="draw__name">{{ character }}</span>
+      } @else {
+        <span class="draw__placeholder">Clique no botão para sortear</span>
+      }
+    </div>
+
+    <button
+      type="button"
+      class="draw__button"
+      (click)="drawCharacter()"
+      [disabled]="isDrawing()"
+    >
+      {{ isDrawing() ? 'Sorteando...' : 'Sortear personagem' }}
+    </button>
+  </section>
+
+  <footer class="roster">
+    <h2 class="roster__title">Personagens no sorteio</h2>
+    <ul class="roster__list">
+      @for (character of characters; track character) {
+        <li
+          class="roster__item"
+          [class.roster__item--drawn]="character === drawnCharacter()"
+        >
+          {{ character }}
+        </li>
+      }
+    </ul>
+  </footer>
+</main>
