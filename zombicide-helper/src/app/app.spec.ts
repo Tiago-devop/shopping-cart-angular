@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
-import { ZOMBICIDE_CHARACTERS } from './characters';
+import { CHARACTER_GROUPS } from './characters';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -22,11 +22,30 @@ describe('App', () => {
     expect(compiled.querySelector('h1')?.textContent).toContain('Zombicide Helper');
   });
 
-  it('should list all characters', async () => {
+  it('should list only owned boxes by default', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     const items = compiled.querySelectorAll('.roster__item');
-    expect(items.length).toBe(ZOMBICIDE_CHARACTERS.length);
+    const ownedCount = CHARACTER_GROUPS.filter((group) => group.owned).reduce(
+      (total, group) => total + group.characters.length,
+      0,
+    );
+    expect(items.length).toBe(ownedCount);
+  });
+
+  it('should list all characters when "all" is selected', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const select = fixture.nativeElement.querySelector('select') as HTMLSelectElement;
+    select.value = 'all';
+    select.dispatchEvent(new Event('change'));
+    await fixture.whenStable();
+    const items = fixture.nativeElement.querySelectorAll('.roster__item');
+    const totalCount = CHARACTER_GROUPS.reduce(
+      (total, group) => total + group.characters.length,
+      0,
+    );
+    expect(items.length).toBe(totalCount);
   });
 });

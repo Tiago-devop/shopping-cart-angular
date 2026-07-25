@@ -38,6 +38,32 @@
   gap: 1.5rem;
   width: 100%;
 
+  &__filter {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__filter-label {
+    color: #a8b0a0;
+    font-size: 0.95rem;
+  }
+
+  &__select {
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    color: #e8e6dd;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(156, 204, 101, 0.4);
+    border-radius: 0.5rem;
+    cursor: pointer;
+
+    &:focus {
+      outline: 2px solid #9ccc65;
+      outline-offset: 1px;
+    }
+  }
+
   &__result {
     width: 100%;
     min-height: 6rem;

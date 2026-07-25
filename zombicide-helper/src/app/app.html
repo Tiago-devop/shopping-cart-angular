@@ -1,10 +1,25 @@
 <main class="app">
   <header class="app__header">
     <h1 class="app__title">🧟 Zombicide Helper</h1>
-    <p class="app__subtitle">Sorteie um personagem para a sua partida</p>
+    <p class="app__subtitle">Sorteie um sobrevivente para a sua partida</p>
   </header>
 
   <section class="draw">
+    <label class="draw__filter">
+      <span class="draw__filter-label">Sortear entre:</span>
+      <select
+        class="draw__select"
+        [value]="selectedBox()"
+        (change)="onBoxChange($any($event.target).value)"
+      >
+        <option value="owned">⭐ Minhas caixas</option>
+        <option value="all">Todas as caixas</option>
+        @for (group of groups; track group.box) {
+          <option [value]="group.box">{{ group.box }}</option>
+        }
+      </select>
+    </label>
+
     <div class="draw__result" [class.draw__result--spinning]="isDrawing()">
       @if (drawnCharacter(); as character) {
         <span class="draw__name">{{ character }}</span>
@@ -19,14 +34,14 @@
       (click)="drawCharacter()"
       [disabled]="isDrawing()"
     >
-      {{ isDrawing() ? 'Sorteando...' : 'Sortear personagem' }}
+      {{ isDrawing() ? 'Sorteando...' : 'Sortear sobrevivente' }}
     </button>
   </section>
 
   <footer class="roster">
-    <h2 class="roster__title">Personagens no sorteio</h2>
+    <h2 class="roster__title">{{ pool().length }} sobreviventes no sorteio</h2>
     <ul class="roster__list">
-      @for (character of characters; track character) {
+      @for (character of pool(); track $index) {
         <li
           class="roster__item"
           [class.roster__item--drawn]="character === drawnCharacter()"
